@@ -136,6 +136,96 @@ const channelInfo = {
     }
 };
 
+// Button templates for different commands
+const buttonTemplates = {
+    help: {
+        text: `🤖 *KnightBot MD Menu* 🤖\n\n📚 *Available Commands:*\n• .help - Show this menu\n• .owner - Bot owner info\n• .settings - Bot settings\n• .groupinfo - Group information\n• .ping - Check bot speed\n• .alive - Check if bot is running\n\n🎮 *Fun Commands:*\n• .meme - Random memes\n• .joke - Funny jokes\n• .quote - Inspirational quotes\n• .fact - Interesting facts\n• .tts - Text to speech\n\n⚙️ *Utility Commands:*\n• .sticker - Create stickers\n• .weather - Weather info\n• .translate - Language translation\n• .lyrics - Song lyrics\n• .ai - AI chat\n\n📥 *Download Commands:*\n• .play - Download audio\n• .video - Download video\n• .instagram - IG download\n• .tiktok - TikTok download\n\n👥 *Group Commands:*\n• .tagall - Mention all members\n• .promote - Promote users\n• .demote - Demote users\n• .kick - Remove users\n• .mute - Mute group\n\n🔧 *Admin Only:*\n• .ban - Ban users\n• .unban - Unban users\n• .antilink - Link protection\n• .antibadword - Filter bad words`,
+        buttons: [
+            { buttonId: '.owner', buttonText: { displayText: '👑 Owner' }, type: 1 },
+            { buttonId: '.settings', buttonText: { displayText: '⚙️ Settings' }, type: 1 },
+            { buttonId: '.groupinfo', buttonText: { displayText: '👥 Group Info' }, type: 1 }
+        ]
+    },
+    owner: {
+        text: `👑 *Bot Owner Information* 👑\n\n*Owner:* Mr Unique Hacker\n*Channel:* ${global.channelLink}\n*YouTube:* ${global.ytch}\n\nFor any issues or queries, please contact the owner through the official channel.`,
+        buttons: [
+            { buttonId: global.channelLink, buttonText: { displayText: '📢 Join Channel' }, type: 1 },
+            { buttonId: '.help', buttonText: { displayText: '📚 Commands' }, type: 1 },
+            { buttonId: '.settings', buttonText: { displayText: '⚙️ Settings' }, type: 1 }
+        ]
+    },
+    settings: {
+        text: `⚙️ *Bot Settings Panel* ⚙️\n\nManage your bot settings and preferences here.`,
+        buttons: [
+            { buttonId: '.mode public', buttonText: { displayText: '🌐 Public Mode' }, type: 1 },
+            { buttonId: '.mode private', buttonText: { displayText: '🔒 Private Mode' }, type: 1 },
+            { buttonId: '.autostatus on', buttonText: { displayText: '📊 Auto Status' }, type: 1 }
+        ]
+    },
+    groupInfo: {
+        text: `👥 *Group Information* 👥\n\nGet detailed information about this group.`,
+        buttons: [
+            { buttonId: '.staff', buttonText: { displayText: '👑 Admins' }, type: 1 },
+            { buttonId: '.resetlink', buttonText: { displayText: '🔄 Reset Link' }, type: 1 },
+            { buttonId: '.tagall', buttonText: { displayText: '📢 Tag All' }, type: 1 }
+        ]
+    },
+    fun: {
+        text: `🎮 *Fun & Games* 🎮\n\nChoose a fun command to play with!`,
+        buttons: [
+            { buttonId: '.meme', buttonText: { displayText: '😂 Meme' }, type: 1 },
+            { buttonId: '.joke', buttonText: { displayText: '😄 Joke' }, type: 1 },
+            { buttonId: '.quote', buttonText: { displayText: '💭 Quote' }, type: 1 },
+            { buttonId: '.fact', buttonText: { displayText: '📚 Fact' }, type: 1 },
+            { buttonId: '.ttt', buttonText: { displayText: '⭕ TicTacToe' }, type: 1 },
+            { buttonId: '.hangman', buttonText: { displayText: '🎯 Hangman' }, type: 1 }
+        ]
+    },
+    download: {
+        text: `📥 *Download Commands* 📥\n\nDownload media from various platforms.`,
+        buttons: [
+            { buttonId: '.play', buttonText: { displayText: '🎵 Audio' }, type: 1 },
+            { buttonId: '.video', buttonText: { displayText: '🎬 Video' }, type: 1 },
+            { buttonId: '.instagram', buttonText: { displayText: '📷 Instagram' }, type: 1 },
+            { buttonId: '.tiktok', buttonText: { displayText: '🎵 TikTok' }, type: 1 },
+            { buttonId: '.facebook', buttonText: { displayText: '📘 Facebook' }, type: 1 },
+            { buttonId: '.spotify', buttonText: { displayText: '🎧 Spotify' }, type: 1 }
+        ]
+    },
+    tools: {
+        text: `🔧 *Utility Tools* 🔧\n\nVarious useful tools and utilities.`,
+        buttons: [
+            { buttonId: '.sticker', buttonText: { displayText: '🖼️ Sticker' }, type: 1 },
+            { buttonId: '.weather', buttonText: { displayText: '🌤️ Weather' }, type: 1 },
+            { buttonId: '.translate', buttonText: { displayText: '🌐 Translate' }, type: 1 },
+            { buttonId: '.lyrics', buttonText: { displayText: '🎶 Lyrics' }, type: 1 },
+            { buttonId: '.ai', buttonText: { displayText: '🤖 AI Chat' }, type: 1 },
+            { buttonId: '.removebg', buttonText: { displayText: '🖼️ Remove BG' }, type: 1 }
+        ]
+    }
+};
+
+// Function to send message with buttons
+async function sendButtonMessage(sock, chatId, templateName, quotedMessage = null) {
+    const template = buttonTemplates[templateName];
+    if (!template) {
+        throw new Error(`Button template '${templateName}' not found`);
+    }
+
+    const messageOptions = {
+        text: template.text,
+        buttons: template.buttons,
+        headerType: 1,
+        ...channelInfo
+    };
+
+    if (quotedMessage) {
+        messageOptions.quoted = quotedMessage;
+    }
+
+    await sock.sendMessage(chatId, messageOptions);
+}
+
 async function handleMessages(sock, messageUpdate, printLog) {
     try {
         const { messages, type } = messageUpdate;
@@ -211,21 +301,17 @@ async function handleMessages(sock, messageUpdate, printLog) {
             return;
         }
 
-        /*  // Basic message response in private chat
-          if (!isGroup && (userMessage === 'hi' || userMessage === 'hello' || userMessage === 'bot' || userMessage === 'hlo' || userMessage === 'hey' || userMessage === 'bro')) {
-              await sock.sendMessage(chatId, {
-                  text: 'Hi, How can I help you?\nYou can use .menu for more info and commands.',
-                  ...channelInfo
-              });
-              return;
-          } */
+        // Basic message response in private chat with buttons
+        if (!isGroup && (userMessage === 'hi' || userMessage === 'hello' || userMessage === 'bot' || userMessage === 'hlo' || userMessage === 'hey' || userMessage === 'bro')) {
+            await sendButtonMessage(sock, chatId, 'help', message);
+            return;
+        }
 
         if (!message.key.fromMe) incrementMessageCount(chatId, senderId);
 
         // Check for bad words FIRST, before ANY other processing
         if (isGroup && userMessage) {
             await handleBadwordDetection(sock, chatId, message, userMessage, senderId);
-
             await Antilink(message, sock);
         }
 
@@ -306,7 +392,6 @@ async function handleMessages(sock, messageUpdate, printLog) {
         }
 
         // Command handlers - Execute commands immediately without waiting for typing indicator
-        // We'll show typing indicator after command execution if needed
         let commandExecuted = false;
 
         switch (true) {
@@ -358,7 +443,7 @@ async function handleMessages(sock, messageUpdate, printLog) {
                 await unbanCommand(sock, chatId, message);
                 break;
             case userMessage === '.help' || userMessage === '.menu' || userMessage === '.bot' || userMessage === '.list':
-                await helpCommand(sock, chatId, message, global.channelLink);
+                await sendButtonMessage(sock, chatId, 'help', message);
                 commandExecuted = true;
                 break;
             case userMessage === '.sticker' || userMessage === '.s':
@@ -385,7 +470,8 @@ async function handleMessages(sock, messageUpdate, printLog) {
                 break;
 
             case userMessage === '.settings':
-                await settingsCommand(sock, chatId, message);
+                await sendButtonMessage(sock, chatId, 'settings', message);
+                commandExecuted = true;
                 break;
             case userMessage.startsWith('.mode'):
                 // Check if sender is the owner
@@ -458,9 +544,10 @@ async function handleMessages(sock, messageUpdate, printLog) {
                 commandExecuted = true;
                 break;
             case userMessage === '.owner':
-                await ownerCommand(sock, chatId);
+                await sendButtonMessage(sock, chatId, 'owner', message);
+                commandExecuted = true;
                 break;
-             case userMessage === '.tagall':
+            case userMessage === '.tagall':
                 await tagAllCommand(sock, chatId, senderId, message);
                 break;
             case userMessage === '.tagnotadmin':
@@ -474,7 +561,7 @@ async function handleMessages(sock, messageUpdate, printLog) {
                 }
                 break;
             case userMessage.startsWith('.tag'):
-                const messageText = rawText.slice(4).trim();  // use rawText here, not userMessage
+                const messageText = rawText.slice(4).trim();
                 const replyMessage = message.message?.extendedTextMessage?.contextInfo?.quotedMessage || null;
                 await tagCommand(sock, chatId, senderId, messageText, replyMessage, message);
                 break;
@@ -639,7 +726,6 @@ async function handleMessages(sock, messageUpdate, printLog) {
                 break;
             case userMessage.startsWith('.welcome'):
                 if (isGroup) {
-                    // Check admin status if not already checked
                     if (!isSenderAdmin) {
                         const adminStatus = await isAdmin(sock, chatId, senderId);
                         isSenderAdmin = adminStatus.isSenderAdmin;
@@ -656,7 +742,6 @@ async function handleMessages(sock, messageUpdate, printLog) {
                 break;
             case userMessage.startsWith('.goodbye'):
                 if (isGroup) {
-                    // Check admin status if not already checked
                     if (!isSenderAdmin) {
                         const adminStatus = await isAdmin(sock, chatId, senderId);
                         isSenderAdmin = adminStatus.isSenderAdmin;
@@ -701,7 +786,6 @@ async function handleMessages(sock, messageUpdate, printLog) {
                     return;
                 }
 
-                // Check if sender is admin or bot owner
                 const chatbotAdminStatus = await isAdmin(sock, chatId, senderId);
                 if (!chatbotAdminStatus.isSenderAdmin && !message.key.fromMe) {
                     await sock.sendMessage(chatId, { text: '*Only admins or bot owner can use this command*', ...channelInfo }, { quoted: message });
@@ -714,7 +798,7 @@ async function handleMessages(sock, messageUpdate, printLog) {
             case userMessage.startsWith('.take') || userMessage.startsWith('.steal'):
                 {
                     const isSteal = userMessage.startsWith('.steal');
-                    const sliceLen = isSteal ? 6 : 5; // '.steal' vs '.take'
+                    const sliceLen = isSteal ? 6 : 5;
                     const takeArgs = rawText.slice(sliceLen).trim().split(' ');
                     await takeCommand(sock, chatId, message, takeArgs);
                 }
@@ -740,7 +824,8 @@ async function handleMessages(sock, messageUpdate, printLog) {
                     await sock.sendMessage(chatId, { text: 'This command can only be used in groups!', ...channelInfo }, { quoted: message });
                     return;
                 }
-                await groupInfoCommand(sock, chatId, message);
+                await sendButtonMessage(sock, chatId, 'groupInfo', message);
+                commandExecuted = true;
                 break;
             case userMessage === '.resetlink' || userMessage === '.revoke' || userMessage === '.anularlink':
                 if (!isGroup) {
@@ -838,7 +923,6 @@ async function handleMessages(sock, messageUpdate, printLog) {
                 await handleAntideleteCommand(sock, chatId, message, antideleteMatch);
                 break;
             case userMessage === '.surrender':
-                // Handle surrender command for tictactoe game
                 await handleTicTacToeMove(sock, chatId, senderId, 'surrender');
                 break;
             case userMessage === '.cleartmp':
@@ -916,9 +1000,11 @@ async function handleMessages(sock, messageUpdate, printLog) {
             case userMessage === '.roseday':
                 await rosedayCommand(sock, chatId, message);
                 break;
-            case userMessage.startsWith('.imagine') || userMessage.startsWith('.flux') || userMessage.startsWith('.dalle'): await imagineCommand(sock, chatId, message);
+            case userMessage.startsWith('.imagine') || userMessage.startsWith('.flux') || userMessage.startsWith('.dalle'):
+                await imagineCommand(sock, chatId, message);
                 break;
-            case userMessage === '.jid': await groupJidCommand(sock, chatId, message);
+            case userMessage === '.jid':
+                await groupJidCommand(sock, chatId, message);
                 break;
             case userMessage.startsWith('.autotyping'):
                 await autotypingCommand(sock, chatId, message);
@@ -1031,7 +1117,6 @@ async function handleMessages(sock, messageUpdate, printLog) {
                     await animeCommand(sock, chatId, message, args);
                 }
                 break;
-            // animu aliases
             case userMessage.startsWith('.nom'):
             case userMessage.startsWith('.poke'):
             case userMessage.startsWith('.cry'):
@@ -1101,10 +1186,22 @@ async function handleMessages(sock, messageUpdate, printLog) {
             case userMessage.startsWith('.sora'):
                 await soraCommand(sock, chatId, message);
                 break;
+            // New button-based commands
+            case userMessage === '.fun':
+                await sendButtonMessage(sock, chatId, 'fun', message);
+                commandExecuted = true;
+                break;
+            case userMessage === '.download':
+                await sendButtonMessage(sock, chatId, 'download', message);
+                commandExecuted = true;
+                break;
+            case userMessage === '.tools':
+                await sendButtonMessage(sock, chatId, 'tools', message);
+                commandExecuted = true;
+                break;
             default:
                 if (isGroup) {
-                    // Handle non-command group messages
-                    if (userMessage) {  // Make sure there's a message
+                    if (userMessage) {
                         await handleChatbotResponse(sock, chatId, message, userMessage, senderId);
                     }
                     await handleTagDetection(sock, chatId, message, senderId);
@@ -1116,7 +1213,6 @@ async function handleMessages(sock, messageUpdate, printLog) {
 
         // If a command was executed, show typing status after command execution
         if (commandExecuted !== false) {
-            // Command was executed, now show typing status after command execution
             await showTypingAfterCommand(sock, chatId);
         }
 
@@ -1138,12 +1234,10 @@ async function handleMessages(sock, messageUpdate, printLog) {
         }
 
         if (userMessage.startsWith('.')) {
-            // After command is processed successfully
             await addCommandReaction(sock, message);
         }
     } catch (error) {
         console.error('❌ Error in message handler:', error.message);
-        // Only try to send error message if we have a valid chatId
         if (chatId) {
             await sock.sendMessage(chatId, {
                 text: '❌ Failed to process command!',
@@ -1157,38 +1251,31 @@ async function handleGroupParticipantUpdate(sock, update) {
     try {
         const { id, participants, action, author } = update;
 
-        // Check if it's a group
         if (!id.endsWith('@g.us')) return;
 
-        // Respect bot mode: only announce promote/demote in public mode
         let isPublic = true;
         try {
             const modeData = JSON.parse(fs.readFileSync('./data/messageCount.json'));
             if (typeof modeData.isPublic === 'boolean') isPublic = modeData.isPublic;
         } catch (e) {
-            // If reading fails, default to public behavior
         }
 
-        // Handle promotion events
         if (action === 'promote') {
             if (!isPublic) return;
             await handlePromotionEvent(sock, id, participants, author);
             return;
         }
 
-        // Handle demotion events
         if (action === 'demote') {
             if (!isPublic) return;
             await handleDemotionEvent(sock, id, participants, author);
             return;
         }
 
-        // Handle join events
         if (action === 'add') {
             await handleJoinEvent(sock, id, participants);
         }
 
-        // Handle leave events
         if (action === 'remove') {
             await handleLeaveEvent(sock, id, participants);
         }
@@ -1197,7 +1284,6 @@ async function handleGroupParticipantUpdate(sock, update) {
     }
 }
 
-// Instead, export the handlers along with handleMessages
 module.exports = {
     handleMessages,
     handleGroupParticipantUpdate,
