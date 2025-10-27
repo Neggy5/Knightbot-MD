@@ -109,6 +109,9 @@ const { animeCommand } = require('./commands/anime');
 const { piesCommand, piesAlias } = require('./commands/pies');
 const stickercropCommand = require('./commands/stickercrop');
 const updateCommand = require('./commands/update');
+const funCommand = require('./fun');
+const downloadCommand = require('./download');
+const toolsCommand = require('./tools');
 const removebgCommand = require('./commands/removebg');
 const { reminiCommand } = require('./commands/remini');
 const { igsCommand } = require('./commands/igs');
@@ -1289,5 +1292,8 @@ module.exports = {
     handleGroupParticipantUpdate,
     handleStatus: async (sock, status) => {
         await handleStatusUpdate(sock, status);
+         funCommand,
+    downloadCommand,
+    toolsCommand
     }
 };
