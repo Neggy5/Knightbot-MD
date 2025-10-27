@@ -264,6 +264,9 @@ async function startXeonBotInc() {
             console.log(chalk.magenta(`${global.themeemoji || '•'} CREDIT: MR UNIQUE HACKER`))
             console.log(chalk.green(`${global.themeemoji || '•'} 🤖 Bot Connected Successfully! ✅`))
             console.log(chalk.blue(`Bot Version: ${settings.version}`))
+            
+            // Add button feature announcement
+            console.log(chalk.magenta(`${global.themeemoji || '•'} 🆕 Interactive Buttons: Enabled ✅`))
         }
         if (connection === 'close') {
             const statusCode = lastDisconnect?.error?.output?.statusCode
